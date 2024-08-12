@@ -3,7 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "InputMappingContext.h"
+#include "EnhancedInputComponent.h"
 #include "MainCharacter.generated.h"
 
 UCLASS()
@@ -26,4 +30,25 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Camera" )
+    UCameraComponent* CameraComponent;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Camera" )
+    USpringArmComponent* SpringArmComponent;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Input")
+    UInputAction* InputMove;
+
+    //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Enhanced Input")
+    //UEnhancedInputComponent* EnhancedInputComponent;
+
+    UPROPERTY(EditAnywhere, Category="Input")
+    TSoftObjectPtr<UInputMappingContext> InputMapping;
+    
+    void LookUp(const FInputActionInstance& Instance);
+    void LookAround(float Amount);
+
+    void SomeCallbackFunc(const FInputActionInstance& Instance);
+
+    void MoveForward(const FInputActionInstance& Amount);
 };
