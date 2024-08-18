@@ -8,6 +8,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "EnhancedInputSubsystemInterface.h"
+#include "EnhancedInputSubsystems.h"
 #include "MainCharacter.generated.h"
 
 UCLASS()
@@ -38,17 +41,24 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Input")
     UInputAction* InputMove;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Input")
+    UInputAction* InputLook;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Movement")
+    UCharacterMovementComponent* CharacterMovementComponent;
 
     //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Enhanced Input")
     //UEnhancedInputComponent* EnhancedInputComponent;
-
-    UPROPERTY(EditAnywhere, Category="Input")
-    TSoftObjectPtr<UInputMappingContext> InputMapping;
     
-    void LookUp(const FInputActionInstance& Instance);
-    void LookAround(float Amount);
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Input")
+    UInputMappingContext* InputMapping;
 
-    void SomeCallbackFunc(const FInputActionInstance& Instance);
+    void MoveInput(const FInputActionInstance& Instance);
+    void LookInput(const FInputActionInstance& Instance2);
 
-    void MoveForward(const FInputActionInstance& Amount);
+    void MoveForward(FVector2D Direction, float Value);
+    void MoveRight(FVector2D Direction, float Value);
+
+    void LookUp(float Value);
+    void LookAround(float Value);
 };
