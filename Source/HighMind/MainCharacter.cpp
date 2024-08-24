@@ -2,8 +2,12 @@
 
 
 #include "MainCharacter.h"
+
+#include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
 
+
+DEFINE_LOG_CATEGORY_STATIC(MainCharacterLog, All, All);
 // Sets default values
 AMainCharacter::AMainCharacter()
 {
@@ -11,10 +15,18 @@ AMainCharacter::AMainCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("Spring Arm");
-    CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera");
-    SpringArmComponent->SetupAttachment(RootComponent);
-    CameraComponent->SetupAttachment(SpringArmComponent);
+    SpringArmComponent->SetupAttachment(GetRootComponent());
+    SpringArmComponent->bUsePawnControlRotation = true;
     
+    CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera");
+    CameraComponent->SetupAttachment(SpringArmComponent);
+    CameraComponent->bUsePawnControlRotation = false;
+
+    CharacterMovementComponent = GetCharacterMovement();
+    HealthComponent = CreateDefaultSubobject<UHealthComponent>("Health Component");
+    
+    TextComponent = CreateDefaultSubobject<UTextRenderComponent>("TextHealth");
+    TextComponent->SetupAttachment(GetRootComponent());
     
     //UEnhancedInputSubsystemInterface* EnhancedInputSubsystemInterface = APlayerController->
     
@@ -27,6 +39,9 @@ void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+check(HealthComponent);
+    
+    
     if(APlayerController* PlayerController = Cast<APlayerController>(Controller))
     {
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -42,6 +57,11 @@ void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+    const auto Health = HealthComponent->GetHealth();
+    TextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
+    
+    UE_LOG(MainCharacterLog, Display, TEXT("Your health: %.0f"), Health);
+    //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, logMessage4);
 }
 
 // Called to bind functionality to input
@@ -52,6 +72,8 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
     
     Input->BindAction(InputMove, ETriggerEvent::Triggered, this, &AMainCharacter::MoveInput);
     Input->BindAction(InputLook, ETriggerEvent::Triggered, this, &AMainCharacter::LookInput);
+    Input->BindAction(InputJump, ETriggerEvent::Started, this, &AMainCharacter::Jump);
+    Input->BindAction(InputAttack, ETriggerEvent::Started, this, &AMainCharacter::Attack);
 }
 
 void AMainCharacter::LookUp(float Value)
@@ -64,8 +86,34 @@ void AMainCharacter::LookAround(float Value)
     AddControllerPitchInput(Value);
 }
 
+void AMainCharacter::Attack()
+{
+}
+
+void AMainCharacter::Jump()
+{
+    Super::Jump();
+
+    FString logMessage3 = FString::Printf(TEXT("JUMP!"));
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, logMessage3);
+    
+}
+
 void AMainCharacter::MoveInput(const FInputActionInstance& Instance)
 {
+    // Получение вектора направления движения
+    FVector Velocity = GetCharacterMovement()->Velocity;
+
+    // Проверка, есть ли движение
+    if (Velocity.SizeSquared() > 0.0f)
+    {
+        // Получение угла поворота
+        FRotator TargetRotation = FRotationMatrix::MakeFromX(Velocity).Rotator();
+
+        // Установка угла поворота персонажа
+        SetActorRotation(TargetRotation);
+    }
+    
     TArray<UInputModifier*> Gris = Instance.GetModifiers();
     //FVector VectorValue = Instance.GetValue().Get<FVector>();
     FVector2D AxisValueVector2D = Instance.GetValue().Get<FVector2D>();

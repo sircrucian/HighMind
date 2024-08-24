@@ -6,14 +6,24 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputSubsystemInterface.h"
 #include "EnhancedInputSubsystems.h"
+#include "HealthComponent.h"
+#include "Components/TextRenderComponent.h"
 #include "MainCharacter.generated.h"
 
+
+UCameraComponent;
+USpringArmComponent;
+UCharacterMovementComponent;
+UTextRenderComponent;
+
 UCLASS()
+
+
 class HIGHMIND_API AMainCharacter : public ACharacter
 {
 	GENERATED_BODY()
@@ -26,6 +36,23 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Camera" )
+    UCameraComponent* CameraComponent;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Camera" )
+    USpringArmComponent* SpringArmComponent;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Health")
+    UHealthComponent* HealthComponent;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Health")
+    UTextRenderComponent* TextComponent;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Movement")
+    UCharacterMovementComponent* CharacterMovementComponent;
+
+    
+    
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -33,19 +60,14 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Camera" )
-    UCameraComponent* CameraComponent;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Camera" )
-    USpringArmComponent* SpringArmComponent;
-
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Input")
     UInputAction* InputMove;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Input")
     UInputAction* InputLook;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Movement")
-    UCharacterMovementComponent* CharacterMovementComponent;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Input")
+    UInputAction* InputJump;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Input")
+    UInputAction* InputAttack;
 
     //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Enhanced Input")
     //UEnhancedInputComponent* EnhancedInputComponent;
@@ -61,4 +83,10 @@ public:
 
     void LookUp(float Value);
     void LookAround(float Value);
+
+    void Attack();
+
+    virtual void Jump() override;
+
+    
 };
