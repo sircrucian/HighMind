@@ -14,34 +14,52 @@ UHealthComponent::UHealthComponent()
 	// ...
 }
 
-
-void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy,
-    AActor* DamageCauser)
-{
-    //UE_LOG(MainCharacterLog, Display, TEXT("Damage: %0.f", Damage));
-    if(Damage <=0 || IsDead()) return;
-    Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
-    OnHealthChanged.Broadcast(Health);
-
-    if(IsDead())
-    {
-        OnDeath.Broadcast();
-    }
-}
-
 void UHealthComponent::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 
-    Health = MaxHealth;
-
-    OnHealthChanged.Broadcast(Health);
-	// ...
+    SetHealth(MaxHealth);
+    
     AActor* ComponentOwner = GetOwner();
     if(ComponentOwner)
     {
         ComponentOwner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::OnTakeAnyDamage);
     }
-	
 }
+
+void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy,
+    AActor* DamageCauser)
+{
+    //UE_LOG(HealthCharacterLog, Display, TEXT("Damage: %0.f", Damage));
+    if(Damage <=0 || IsDead() || !GetWorld()) return;
+    
+    SetHealth(Health - Damage);
+
+    if(IsDead())
+    {
+        OnDeath.Broadcast();
+    }
+    else if(AutoHeal)
+    {
+        GetWorld()->GetTimerManager().SetTimer(HealTimerHandle, this, &UHealthComponent::HealUpdate, HealUpdateTime, true, HealDelay);
+    }
+}
+
+void UHealthComponent::HealUpdate()
+{
+    SetHealth(Health + HealModifier);
+
+    if(FMath::IsNearlyEqual(Health, MaxHealth) && GetWorld())
+    {
+        GetWorld()->GetTimerManager().ClearTimer(HealTimerHandle);
+    }
+}
+
+void UHealthComponent::SetHealth(float NewHealth)
+{
+    Health = FMath::Clamp(NewHealth, 0.0f, MaxHealth);
+    OnHealthChanged.Broadcast(Health);
+}
+
+
 

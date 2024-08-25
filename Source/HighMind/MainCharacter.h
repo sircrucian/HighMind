@@ -35,7 +35,7 @@ public:
 private:
     void OnDeath();
 
-    void OnHealthChanged(float Health);
+    void OnHealthChanged(float Health) const;
 protected:
     
 	// Called when the game starts or when spawned

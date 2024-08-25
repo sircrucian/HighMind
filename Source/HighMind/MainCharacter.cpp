@@ -34,25 +34,19 @@ AMainCharacter::AMainCharacter()
 
 }
 
-void AMainCharacter::OnDeath()
-{
-    UE_LOG(MainCharacterLog, Display, TEXT("Player %s is dead"), *GetName());
-
-    PlayAnimMontage(DeathAnimMontage);
-
-    CharacterMovementComponent->DisableMovement();
-}
-
 // Called when the game starts or when spawned
 void AMainCharacter::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 
     check(HealthComponent);
     check(CharacterMovementComponent);
     
     HealthComponent->OnDeath.AddUObject(this, &AMainCharacter::OnDeath);
     HealthComponent->OnHealthChanged.AddUObject(this, &AMainCharacter::OnHealthChanged);
+
+    OnHealthChanged(HealthComponent->GetHealth());
+    
     if(APlayerController* PlayerController = Cast<APlayerController>(Controller))
     {
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -63,7 +57,16 @@ void AMainCharacter::BeginPlay()
     }
 }
 
-void AMainCharacter::OnHealthChanged(float Health)
+void AMainCharacter::OnDeath()
+{
+    UE_LOG(MainCharacterLog, Display, TEXT("Player %s is dead"), *GetName());
+
+    PlayAnimMontage(DeathAnimMontage);
+
+    CharacterMovementComponent->DisableMovement();
+}
+
+void AMainCharacter::OnHealthChanged(float Health) const
 {
     TextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
 }
