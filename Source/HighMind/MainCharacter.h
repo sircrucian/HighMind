@@ -32,7 +32,12 @@ public:
 	// Sets default values for this character's properties
 	AMainCharacter();
 
+private:
+    void OnDeath();
+
+    void OnHealthChanged(float Health);
 protected:
+    
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -51,9 +56,10 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Movement")
     UCharacterMovementComponent* CharacterMovementComponent;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category= "Animation")
+    UAnimMontage* DeathAnimMontage;
     
-    
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

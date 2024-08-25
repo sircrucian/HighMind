@@ -34,14 +34,25 @@ AMainCharacter::AMainCharacter()
 
 }
 
+void AMainCharacter::OnDeath()
+{
+    UE_LOG(MainCharacterLog, Display, TEXT("Player %s is dead"), *GetName());
+
+    PlayAnimMontage(DeathAnimMontage);
+
+    CharacterMovementComponent->DisableMovement();
+}
+
 // Called when the game starts or when spawned
 void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-check(HealthComponent);
+    check(HealthComponent);
+    check(CharacterMovementComponent);
     
-    
+    HealthComponent->OnDeath.AddUObject(this, &AMainCharacter::OnDeath);
+    HealthComponent->OnHealthChanged.AddUObject(this, &AMainCharacter::OnHealthChanged);
     if(APlayerController* PlayerController = Cast<APlayerController>(Controller))
     {
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -52,15 +63,20 @@ check(HealthComponent);
     }
 }
 
+void AMainCharacter::OnHealthChanged(float Health)
+{
+    TextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
+}
+
 // Called every frame
 void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
     const auto Health = HealthComponent->GetHealth();
-    TextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
+    HealthComponent->OnHealthChanged.AddUObject(this, &AMainCharacter::OnHealthChanged);
+    //UE_LOG(MainCharacterLog, Display, TEXT("Your health: %.0f"), Health); log for monitoring current health
     
-    UE_LOG(MainCharacterLog, Display, TEXT("Your health: %.0f"), Health);
     //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, logMessage4);
 }
 
