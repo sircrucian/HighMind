@@ -13,13 +13,15 @@
 #include "EnhancedInputSubsystems.h"
 #include "HealthComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "WeaponComponent.h"
 #include "MainCharacter.generated.h"
 
 
-UCameraComponent;
-USpringArmComponent;
-UCharacterMovementComponent;
-UTextRenderComponent;
+class UCameraComponent;
+class USpringArmComponent;
+class UCharacterMovementComponent;
+class UTextRenderComponent;
+class AWeaponComponent;
 
 UCLASS()
 
@@ -50,6 +52,9 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Health")
     UHealthComponent* HealthComponent;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Weapon")
+    TSubclassOf<AWeaponComponent> WeaponClass;
+    
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Health")
     UTextRenderComponent* TextComponent;
     
@@ -81,6 +86,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Input")
     UInputMappingContext* InputMapping;
 
+private:
     void MoveInput(const FInputActionInstance& Instance);
     void LookInput(const FInputActionInstance& Instance2);
 
@@ -94,5 +100,6 @@ public:
 
     virtual void Jump() override;
 
+    void SpawnWeapon();
     
 };

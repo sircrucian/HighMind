@@ -22,6 +22,9 @@ AMainCharacter::AMainCharacter()
     CameraComponent->SetupAttachment(SpringArmComponent);
     CameraComponent->bUsePawnControlRotation = false;
 
+    //WeaponComponent = CreateDefaultSubobject<AWeaponComponent>("Weapon");
+    
+    
     CharacterMovementComponent = GetCharacterMovement();
     HealthComponent = CreateDefaultSubobject<UHealthComponent>("Health Component");
     
@@ -45,6 +48,8 @@ void AMainCharacter::BeginPlay()
     HealthComponent->OnDeath.AddUObject(this, &AMainCharacter::OnDeath);
     HealthComponent->OnHealthChanged.AddUObject(this, &AMainCharacter::OnHealthChanged);
 
+    SpawnWeapon();
+    
     OnHealthChanged(HealthComponent->GetHealth());
     
     if(APlayerController* PlayerController = Cast<APlayerController>(Controller))
@@ -116,6 +121,17 @@ void AMainCharacter::Jump()
     FString logMessage3 = FString::Printf(TEXT("JUMP!"));
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, logMessage3);
     
+}
+
+void AMainCharacter::SpawnWeapon()
+{
+    if(!GetWorld()) return;
+    const auto Weapon = GetWorld()->SpawnActor<AWeaponComponent>(WeaponClass);
+    if(Weapon)
+    {
+        FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
+        Weapon->AttachToComponent(GetMesh(), AttachmentRules, "WeaponSocket");
+    }
 }
 
 void AMainCharacter::MoveInput(const FInputActionInstance& Instance)
