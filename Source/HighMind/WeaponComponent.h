@@ -22,8 +22,19 @@ protected:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     USkeletalMeshComponent* WeaponMesh;
+
+    
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+    UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Damage")
+    bool bMayDamage = false;
+
+    bool GetMD() const {return pohuy;}
+
+private:
+    bool pohuy;
+
+    void Toggle(bool random);
 };

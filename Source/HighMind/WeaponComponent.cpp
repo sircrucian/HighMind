@@ -27,3 +27,8 @@ void AWeaponComponent::Tick(float DeltaTime)
 
 }
 
+void AWeaponComponent::Toggle(bool random)
+{
+    random = !random;
+}
+

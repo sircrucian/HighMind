@@ -30,8 +30,7 @@ AMainCharacter::AMainCharacter()
     
     TextComponent = CreateDefaultSubobject<UTextRenderComponent>("TextHealth");
     TextComponent->SetupAttachment(GetRootComponent());
-    
-    //UEnhancedInputSubsystemInterface* EnhancedInputSubsystemInterface = APlayerController->
+    //TextComponent->SetOwnerNoSee(true); // this param using when needed hide component in main char
     
     //CharacterMovementComponent = CreateDefaultSubobject<UCharacterMovementComponent>("Move Component");
 
@@ -112,6 +111,11 @@ void AMainCharacter::LookAround(float Value)
 
 void AMainCharacter::Attack()
 {
+    FString logMessage4 = FString::Printf(TEXT("ATTACK!"));
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, logMessage4);
+
+    PlayAnimMontage(AttackAnimMontage);
+    
 }
 
 void AMainCharacter::Jump()
@@ -131,6 +135,7 @@ void AMainCharacter::SpawnWeapon()
     {
         FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
         Weapon->AttachToComponent(GetMesh(), AttachmentRules, "WeaponSocket");
+        Weapon->bMayDamage=false;
     }
 }
 

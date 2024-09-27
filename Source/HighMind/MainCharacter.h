@@ -63,6 +63,9 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category= "Animation")
     UAnimMontage* DeathAnimMontage;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category= "Animation")
+    UAnimMontage* AttackAnimMontage;
     
 public:
 	// Called every frame
